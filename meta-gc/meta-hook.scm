@@ -16,12 +16,13 @@
 (load "meta-gc.scm")
 
 (define (make-gc-hook)
-	(define (add-hook)
-		;;FIXME fill in SMOB system in C
-	)
-
-	(define (dispatch msg)
-		(cond ((eq? msg 'add-hook) add-hook)
-		      (else (display "make-gc-hook : message not understood : ")(display msg)(newline)
-		))
-	)) 
+  (define (add-hook)
+    ;;FIXME fill in SMOB system in C
+    #f)
+  
+  (define (dispatch msg)
+    (cond ((eq? msg 'add-hook) add-hook)
+	  (else (display "make-gc-hook : message not understood : ")(display msg)(newline)
+		)))
+  
+  dispatch)
