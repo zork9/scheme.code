@@ -23,6 +23,8 @@
 		(*null '())
 		(*max-datasize 1024)	
 		(*datasize 0)	
+		(*currentn 0)	
+		(*max-chunksize 8)	
 		(*dynamic-data '())	
 		)
 
@@ -38,7 +40,8 @@
 
 	(define (get-heap) *heap)
 
-	(define (get-data-size d) (length d))
+	;; data is a string
+	(define (get-data-size d) (string-length d))
 
 	(define (generate-error msg)
 		(cond ((eq? msg 'memory-exhausted)
@@ -46,15 +49,36 @@
 		)	
 
 	(define (add-to-heap! n)
-		(do ((n2 0))
-			(>= n2 n)
+		(do ((n2 0 (+ n2 1)))
+			((>= n2 n) *heap)
 			(set! *heap (append (get-heap) (list (make-chunk)))))
 
 	(define (make-chunk)
 		(cons 'chunk *null))  
 
+	;;NOTE append null string after <8
+	;; data is a string
+	(define (split-data data)
+		(let ((s ""))
+		(let ((retl '())
+		(do ((n2 0 (+ n2 1)))
+			((>= n2 (string-length data))
+			retl)
+		(do ((n 0 (+ n 1)))
+			((or (>= n 8)(>= (+ n2 n) (string-length data)))
+				 (append retl (list s))(set! n2 (+ n2 n)))
+			(string-append s (string-ref data n))
+			)))
+
+	;; FIX over *currentn
 	(define (set-data! chunk data)
-		(set! (cdr chunk) data))) 
+		(let ((lst (split-data data)))
+
+		(do ((n 0 (+ n 1)))
+			((>= n (length lst)) #t)
+			(set! (list-ref (get-heap) (+ n *currentn)) 
+			(list-ref lst n))) 
+		(set! *currentn (+ n *currentn)))
 
 	(define (set-chunk-data! chunk)
 		(set! *datasize (+ *datasize (get-data-size chunk))))

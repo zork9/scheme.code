@@ -37,7 +37,8 @@
 
 	(define (get-heap) *heap)
 
-	(define (get-data-size d) (length d))
+	;; data is a string
+	(define (get-data-size d) (string-length d))
 
 	(define (generate-error msg)
 		(cond ((eq? msg 'memory-exhausted)
