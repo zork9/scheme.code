@@ -14,11 +14,11 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Fixed chunk size gc, can be used in meta-gc.scm API
+;; Fixed chunk size gc, fast algorithm, can be used in meta-gc.scm API
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(define (make-sized-gc)
+(define (make-sized-fast-gc)
 	(let ((*heap '())
 		(*null '())
 		(*max-datasize 1024)	

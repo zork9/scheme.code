@@ -13,32 +13,15 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(load "gc.scm")
-(load "gc-sized.scm")
-(load "gc-sized-fast.scm")
+(load "meta-gc.scm")
 
-(define (make-meta-gc gc-actor-maker)
-	(let ((*gc-program (gc-actor-maker))
-		)
-
-	;; interrupt system : FIXME sort of hooks
-	(define (signal number)
-		(cond ((= number 9)
-			(display "exiting meta-gc...")
-			(exit))
-		      ((= number 7)
-			(display "exiting meta-gc...")
-			(exit))
-	              (else (display "make-meta-gc : SIGNAL == ")(display number)(display " unknown signal to gc")
-				(newline)	
-			)))
+(define (make-gc-hook)
+	(define (add-hook)
+		;;FIXME fill in SMOB system in C
+	)
 
 	(define (dispatch msg)
-		(cond ((eq? msg 'run) run)
-		      ((eq? msg 'signal) signal)
-		      ((eq? msg 'int) signal)
-		      ((eq? msg 'interrupt) signal)
-
-		      (else (display "make-meta-gc : message not understood : ")(display msg)(newline)
+		(cond ((eq? msg 'add-hook) add-hook)
+		      (else (display "make-gc-hook : message not understood : ")(display msg)(newline)
 		))
 	)) 
