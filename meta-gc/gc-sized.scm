@@ -14,8 +14,9 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; One chunk per memory allocation, can be used in meta-gc.scm API
+;; Fixed chunk size gc, can be used in meta-gc.scm API
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 (define (make-gc)
 	(let ((*heap '())
@@ -45,7 +46,9 @@
 		)	
 
 	(define (add-to-heap! n)
-		(set! *heap (append (get-heap) (list (make-chunk)))))
+		(do ((n2 0))
+			(>= n2 n)
+			(set! *heap (append (get-heap) (list (make-chunk)))))
 
 	(define (make-chunk)
 		(cons 'chunk *null))  

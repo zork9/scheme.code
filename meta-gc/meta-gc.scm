@@ -15,8 +15,8 @@
 
 (load "gc.scm")
 
-(define (make-meta-gc)
-	(let ((*gc-program (make-gc))
+(define (make-meta-gc gc-actor-maker)
+	(let ((*gc-program (gc-actor-maker))
 		)
 
 	;; interrupt system : FIXME sort of hooks
