@@ -18,54 +18,53 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (make-gc)
-	(let ((*heap '())
-		(*null '())
-		(*max-datasize 1024)	
-		(*datasize 0)	
-		(*dynamic-data '())	
-		)
+  (let ((*heap '())
+	(*null '())
+	(*max-datasize 1024)	
+	(*datasize 0)	
+	(*dynamic-data '())	
+	)
+    
+    (define (malloc)
+      (add-to-heap! 1)
+      )
+    (define (calloc nchunks)
+      (add-to-heap! nchunks)
+      )
 
-	(define (malloc)
-		(add-to-heap! 1)
-		)
-	(define (calloc nchunks)
-		(add-to-heap! nchunks)
-		)
 
+    ;; private procedures
+    
+    (define (get-heap) *heap)
+    
+    ;; data is a string
+    (define (get-data-size d) (string-length d))
 
-	;; private procedures
+    (define (generate-error msg)
+      (cond ((eq? msg 'memory-exhausted)
+	     (display "memory exhausted")(newline))
+	    ))
+    
+    (define (add-to-heap! n)
+      (set! (get-heap) (append (get-heap) (list (make-chunk)))))
 
-	(define (get-heap) *heap)
+    (define (make-chunk)
+      (cons 'chunk *null))  
 
-	;; data is a string
-	(define (get-data-size d) (string-length d))
-
-	(define (generate-error msg)
-		(cond ((eq? msg 'memory-exhausted)
-			(display "memory exhausted)(newline))
-		)	
-
-	(define (add-to-heap! n)
-		(set! *heap (append (get-heap) (list (make-chunk)))))
-
-	(define (make-chunk)
-		(cons 'chunk *null))  
-
-	(define (set-data! chunk data)
-		(set! (cdr chunk) data))) 
-
-	(define (set-chunk-data! chunk)
-		(set! *datasize (+ *datasize (get-data-size chunk))))
-		(if (> *datasize *max-datasize) 
-			(generate-error 'memory-exhausted)
-			;; The data is dynamically bound in this actor
-			(set-data! chunk *dynamic-data)
-			))
-
-	(define (dispatch msg)
-		(cond ((eq? msg 'malloc) malloc)	
-		      ((eq? msg 'calloc) calloc)
-	
-			(else (display "make-gc : message not understood : ")(display msg)(newline))
-		))
-	))		
+    (define (set-data! chunk data)
+      (set! (cdr chunk) data))
+    
+    (define (set-chunk-data! chunk)
+      (set! *datasize (+ *datasize (get-data-size chunk)))
+      (if (> *datasize *max-datasize) 
+	  (generate-error 'memory-exhausted)
+	  ;; The data is dynamically bound in this actor
+	  (set-data! chunk *dynamic-data)
+	  ))
+  
+  (define (dispatch msg)
+    (cond ((eq? msg 'malloc) malloc)	
+	  ((eq? msg 'calloc) calloc)
+	  (else (display "make-gc : message not understood : ")(display msg)(newline))
+	  ))
+  dispatch))
