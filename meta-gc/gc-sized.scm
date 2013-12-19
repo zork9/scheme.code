@@ -16,14 +16,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Fixed chunk size gc, can be used in meta-gc.scm API
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+(load "stringutil.scm")
 
 (define (make-sized-gc)
   (let ((*heap '())
 	(*null '())
 	(*max-datasize 1024)	
 	(*datasize 0)	
-	(*currentn 0)	
+	(*currentn 0) ;; right write mark	
 	(*max-chunksize 8)	
 	(*dynamic-data '())	
 	)
@@ -49,10 +49,10 @@
 	    ))
     
     (define (add-to-heap! n)
-      (do ((n2 0 (+ n2 1)))
-	  ((>= n2 n) *heap)
-	(set! *heap (append (get-heap) (list (make-chunk)))))
-      )
+      ((lambda (n)
+	 (if (= n 0)
+	     '()
+	     (append (list (make-chunk)) (add-to-heap-rec! (- n 1)))))))
     
     (define (make-chunk)
       (cons 'chunk *null))  
@@ -60,21 +60,28 @@
     ;;NOTE append null string after <8
     ;; data is a string
     (define (split-data data)
-      (let ((s ""))
-	(let ((retl '()))
-	  (do ((n2 0 (+ n2 1)))
-	      ((>= n2 (string-length data))
-	       retl)
-	    (do ((n 0 (+ n 1)))
-		((or (>= n 8)(>= (+ n2 n) (string-length data)))
-		 (append retl (list s))(set! n2 (+ n2 n)))
-	      (string-append s (string-ref data n))
-	      ))
-	  )))
-  
+      (let ((split-data-func (lambda (datastr) 
+			       (append (list (substring datastr 0 8))
+4				       (cond ((< (string-length datastr) 8)
+					      datastr)
+					     (else
+					      ;; this might be a guilism
+					      (split-data-func (substring data 8))))))
+			     ))
+	(split-data-func data)))
+
+    (define (split-data2 data)
+      (let ((split-data-func2 (lambda (datalist)
+			       (append (sublist datalist 0 8)
+				       (cond ((< (length datalist) 8)
+					      datalist)
+					     (else
+					      (split-data-func2 (sublist datalist 8 (- (string-length datalist) 8)))))))))
+	(map split-data-func2 (string->list data))))
+    
     ;; FIX over *currentn
     (define (set-data! chunk data)
-      (let ((lst (split-data data)))
+      (let* ((lst (split-data data)))
 	(do ((n 0 (+ n 1)))
 	    ((>= n (length lst)) #t)
 	  (set! (list-ref (get-heap) (+ n *currentn)) 
