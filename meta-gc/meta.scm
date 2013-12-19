@@ -16,6 +16,7 @@
 (load "meta-gc.scm")
 
 ;; special REPL
+;; You can add REPL functions such as ((make-meta) 'cons our-cons)
 (define (make-meta)
   (let ((*applicants '()))
     
