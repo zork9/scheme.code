@@ -52,7 +52,7 @@
       ((lambda (n)
 	 (if (= n 0)
 	     '()
-	     (append (list (make-chunk)) (add-to-heap-rec! (- n 1)))))))
+	     (append (list (make-chunk)) (add-to-heap! (- n 1)))))))
     
     (define (make-chunk)
       (cons 'chunk *null))  

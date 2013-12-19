@@ -33,13 +33,13 @@
 
     ;; dynamically bound *fl- function
     (define (post-applicants args)
-      (if (procedure? *fl-)
-	  (*fl- args)))
+      (if (procedure? f-)
+	  (f- args)))
       
     (define (dispatch msg)
       (cond ((eq? msg 'add-hook) add-hook)
-	    ((let ((*fl- (search-applicants msg)))
-	       (if *fl-
+	    ((let ((f- (search-applicants msg)))
+	       (if f-
 		   post-applicants)))
 	    (else (display "make-meta : message not understood : ")(display msg)(newline)
 		)))
