@@ -31,7 +31,7 @@
 		  (cdar *applicants))
 		 ))))
 
-    ;; dynamically bound *fl- function
+    ;; dynamically bound f- function
     (define (post-applicants args)
       (if (procedure? f-)
 	  (f- args)))
@@ -44,4 +44,4 @@
 	    (else (display "make-meta : message not understood : ")(display msg)(newline)
 		)))
     
-    dispatch)
+    dispatch))
